@@ -1,9 +1,8 @@
 """
 Input: Data file with 2 columns
 Output: Pearson correlation coefficient
-
-Last edited on 11 April 2020 by Swapna Sindhu Mishra
 """
+
 folderpath='U:/' #Datafile location?
 filename='Correlation_Data.dat' #Datafile name?
 
