@@ -1,0 +1,76 @@
+# MIF 2.1
+# This file converted from MIF 1.1 format by MIF Conversion utility 1.2.0.4
+# Original file: E:/oommf-1.2a5bis/perp_antidot_triangle_2.mif
+
+set PI [expr {4*atan(1.)}]
+set MU0 [expr {4*$PI*1e-7}]
+
+RandomSeed 1
+
+Specify Oxs_ImageAtlas:atlas {
+  xrange {0 2e-6}
+  yrange {0 2e-6}
+  zrange {0 0.8e-9}
+  image triangle_antidot.ppm
+  viewplane xy
+  colormap {
+      white nonmagnetic
+      black magnetic
+  }
+}
+
+Specify Oxs_RectangularMesh:mesh {
+  cellsize {0.8e-9 0.8e-9 0.8e-9}
+  atlas :atlas
+}
+
+Specify Oxs_UniaxialAnisotropy {
+  K1  3000e3
+  axis { Oxs_UniformVectorField {
+    norm 1
+    vector {0.05 0.05 1}
+  }  }
+}
+
+Specify Oxs_UniformExchange {
+  A  1e-11
+}
+
+Specify Oxs_Demag {}
+
+Specify Oxs_UZeeman:extfield0 [subst {
+  comment {Field values in Tesla; scale to A/m}
+  multiplier [expr {1/$MU0}]
+  Hrange {
+    {0 0 10 0 0 -2.5 50}
+    {0 0 -2.5 0 0 -4.5 400}
+    {0 0 -4.5 0 0 -10 50}
+  }
+}]
+
+Specify Oxs_RungeKuttaEvolve:evolver {
+  do_precess 1
+  gamma_LL 221000
+  alpha 0.5
+  method rkf54
+}
+
+Specify Oxs_TimeDriver {
+  basename perp_antidot_triangle_5x5
+  vector_field_output_format {binary 4}
+  evolver :evolver
+  mesh :mesh
+  stopping_dm_dt 1.5572652687424418
+  stage_count 501
+  Ms {Oxs_AtlasScalarField {
+    atlas :atlas
+    values {
+      nonmagnetic  0
+      magnetic     1100e3
+  } } }
+  m0 { 0.0 0.0 1.0 }
+}
+
+Destination archive mmArchive
+Schedule DataTable archive step 100
+Schedule Oxs_TimeDriver::Magnetization archive step 100
